@@ -2,8 +2,9 @@ export interface IPost {
   key: string;
   title: string;
   author?: string;
-  date?: Date;
+  date?: string;
   body?: string;
+  imageUrl?: string;
   category?: string;
   tags?: string[];
 }

@@ -1,4 +1,6 @@
-import { IPostProvider, Renderer } from '../../src/index';
+import { IPost, IPostProvider, Renderer } from '../../src/index';
+import { IPostQuery } from '../../src/IPostQuery';
+import { ITemplateProvider } from '../../src/ITemplateProvider';
 
 describe('Renderer', () => {
   describe('render()', () => {
@@ -10,9 +12,26 @@ describe('Renderer', () => {
         get: (key) => {
           return Promise.resolve({ key, title: 'foo' });
         },
+        save: () => { return Promise.resolve(); },
       };
 
-      const renderer = new Renderer(postProvider);
+      const mockGetTemplate = jest.fn();
+      const templateProvider: ITemplateProvider = {
+        getTemplate: mockGetTemplate,
+      };
+
+      const renderer = new Renderer({ 
+        postProvider, 
+        templateProvider,
+        pageConfig: {
+          pageTitle: 'Title',
+          root: 'https://here.com',
+          contentRoot: 'https://content.here.com',
+          social: [],
+        } 
+      });
+
+      mockGetTemplate.mockResolvedValue('Handlebars <b>{{doesWhat}}</b> compiled!');
       const result = await renderer.render('Handlebars <b>{{doesWhat}}</b> compiled!', { doesWhat: 'rocks!' });
 
       expect(result).toBe('Handlebars <b>rocks!</b> compiled!');
@@ -22,13 +41,13 @@ describe('Renderer', () => {
   describe('renderList()', () => {
     it('should render template with all post fields', async() => {
       const postProvider: IPostProvider = {
-        list: () => {
+        list: (query?: IPostQuery): Promise<IPost[]> => {
           return Promise.resolve([
             {
               key: 'post-1',
               title: 'Blog post 1',
               author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 1),
+              date: new Date(2000, 0, 1).toLocaleDateString('en-us'),
               body: 'This is a blog post',
               category: 'Posts about Blogs',
               tags: [ 'blog', 'post' ],
@@ -37,7 +56,7 @@ describe('Renderer', () => {
               key: 'post-2',
               title: 'Blog post 2',
               author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 2),
+              date: new Date(2000, 0, 2).toLocaleDateString('en-us'),
               body: 'This is another blog post',
               category: 'Posts about Blogs',
               tags: [ 'blog', 'post' ],
@@ -47,14 +66,30 @@ describe('Renderer', () => {
         get: (key) => {
           return Promise.resolve({ key, title: 'foo' });
         },
+        save: () => { return Promise.resolve(); },
       };
 
-      const renderer = new Renderer(postProvider);
+      const mockGetTemplate = jest.fn();
+      const templateProvider: ITemplateProvider = {
+        getTemplate: mockGetTemplate,
+      };
 
-      const template = '{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{body}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}';
-      const result = await renderer.renderList(template);
+      const renderer = new Renderer({ 
+        postProvider, 
+        templateProvider,
+        pageConfig: {
+          pageTitle: 'Title',
+          root: 'https://here.com',
+          contentRoot: 'https://content.here.com',
+          social: [],
+        } 
+      });
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::This is another blog post/Posts about Blogs[blog,post,]');
+
+      mockGetTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+      const result = await renderer.renderList('foo');
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
     });
 
     it('should render list with minimum post fields', async() => {
@@ -74,12 +109,27 @@ describe('Renderer', () => {
         get: (key) => {
           return Promise.resolve({ key, title: 'foo' });
         },
+        save: () => { return Promise.resolve(); },
       };
 
-      const renderer = new Renderer(postProvider);
+      const mockGetTemplate = jest.fn();
+      const templateProvider: ITemplateProvider = {
+        getTemplate: mockGetTemplate,
+      };
 
-      const template = '<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>';
-      const result = await renderer.renderList(template);
+      const renderer = new Renderer({ 
+        postProvider, 
+        templateProvider,
+        pageConfig: {
+          pageTitle: 'Title',
+          root: 'https://here.com',
+          contentRoot: 'https://content.here.com',
+          social: [],
+        } 
+      });
+
+      mockGetTemplate.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
+      const result = await renderer.renderList('foo');
 
       expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
     });
@@ -96,20 +146,35 @@ describe('Renderer', () => {
             key,
             title: 'Blog post 1',
             author: 'Bloggy Blogerton',
-            date: new Date(2000, 0, 1),
+            date: new Date(2000, 0, 1).toLocaleDateString('en-us'),
             body: 'This is a blog post',
             category: 'Posts about Blogs',
             tags: [ 'blog', 'post' ],
           });
         },
+        save: () => { return Promise.resolve(); },
       };
 
-      const renderer = new Renderer(postProvider);
+      const mockGetTemplate = jest.fn();
+      const templateProvider: ITemplateProvider = {
+        getTemplate: mockGetTemplate,
+      };
 
-      const template = '{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{body}}/{{category}}[{{#tags}}{{this}},{{/tags}}]';
-      const result = await renderer.renderPost('post-1', template);
+      const renderer = new Renderer({ 
+        postProvider, 
+        templateProvider,
+        pageConfig: {
+          pageTitle: 'Title',
+          root: 'https://here.com',
+          contentRoot: 'https://content.here.com',
+          social: [],
+        } 
+      });
+      
+      mockGetTemplate.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
+      const result = await renderer.renderPost('post-1', 'foo');
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]');
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]');
     });
   });
 });
