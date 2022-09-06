@@ -1,11 +1,16 @@
 import Handlebars from 'handlebars';
 import { IPostProvider } from 'IPostProvider';
+import { IRendererOptions } from 'IRendererOptions';
+import { ITemplateProvider } from 'ITemplateProvider';
 
 export class Renderer {
   private postProvider: IPostProvider;
+  private templateProvider: ITemplateProvider;
 
-  constructor(postProvider: IPostProvider) {
-    this.postProvider = postProvider;
+  constructor(options: IRendererOptions) {
+    this.postProvider = options.postProvider;
+    this.templateProvider = options.templateProvider;
+
     Handlebars.registerHelper('formatDate', this.formatDate)
   }
 
@@ -14,14 +19,24 @@ export class Renderer {
     return compiled(content);
   }
 
-  public async renderList<T>(template: string): Promise<string> {
+  public async renderHome<T>(): Promise<string> {
+    const template = await this.templateProvider.getHomeTemplate();
     const posts = await this.postProvider.list();
     const compiled = Handlebars.compile(template);
 
     return compiled({ posts });
   }
 
-  public async renderPost<T>(key: string, template: string): Promise<string> {
+  public async renderList<T>(): Promise<string> {
+    const template = await this.templateProvider.getListTemplate();
+    const posts = await this.postProvider.list();
+    const compiled = Handlebars.compile(template);
+
+    return compiled({ posts });
+  }
+
+  public async renderPost<T>(key: string): Promise<string> {
+    const template = await this.templateProvider.getLPostTemplate();
     const post = await this.postProvider.get(key);
     const compiled = Handlebars.compile(template);
 
