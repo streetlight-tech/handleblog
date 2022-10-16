@@ -6,14 +6,17 @@ import { IPost } from './IPost';
 import { IRendererOptions } from './IRendererOptions';
 import { ITemplateProvider } from './ITemplateProvider';
 import { IPostQuery } from './IPostQuery';
+import { IPageProvider } from './IPageProvider';
 
 export class Renderer {
   private postProvider: IPostProvider;
+  private pageProvider: IPageProvider;
   private templateProvider: ITemplateProvider;
   private pageConfig: IPageConfig;
 
   constructor(options: IRendererOptions) {
     this.postProvider = options.postProvider;
+    this.pageProvider = options.pageProvider;
     this.templateProvider = options.templateProvider;
     this.pageConfig = options.pageConfig;
     Handlebars.registerHelper('formatDate', this.formatDate)
@@ -27,7 +30,7 @@ export class Renderer {
     return compiled(content);
   }
 
-  public async renderHime<T>(query: IPostQuery): Promise<string> {
+  public async renderHome<T>(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getHomeTemplate();
     const posts = await this.postProvider.list(query);
 
@@ -39,7 +42,7 @@ export class Renderer {
     });
   }
 
-  public async renderList<T>(query: IPostQuery): Promise<string> {
+  public async renderList<T>(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getListTemplate();
     const posts = await this.postProvider.list(query);
 
@@ -52,7 +55,7 @@ export class Renderer {
   }
 
   public async renderPost<T>(key: string): Promise<string> {
-    const template = await this.templateProvider.getLPostTemplate();
+    const template = await this.templateProvider.getPostTemplate();
     const post = await this.postProvider.get(key);
 
     Renderer.parseBody(post);
@@ -63,8 +66,22 @@ export class Renderer {
     });
   }
 
+  public async renderPage<T>(key: string): Promise<string> {
+    const template = await this.templateProvider.getPageTemplate();
+    const page = await this.pageProvider.get(key);
+
+    Renderer.parseBody(page);
+
+    return this.render(template, {
+      ...page,
+      ...this.pageConfig,
+    });
+  }
+
   public static parseBody(post: IPost) {
-    post.body = marked.parse(post.body);
+    if (post.body) {
+      post.body = marked.parse(post.body);
+    }
   }
 
   public formatDate(dateValue: string) {
