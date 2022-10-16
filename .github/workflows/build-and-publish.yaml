@@ -36,6 +36,6 @@ jobs:
       - name: Install clean modules
         run: yarn install --frozen-lockfile
       - name: Publish
-        run: npm publish --access=public
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npmToken }}

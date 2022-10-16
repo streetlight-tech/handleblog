@@ -1,5 +1,5 @@
 {
-  "name": "@streetlight-tech/handleblog",
+  "name": "handleblog",
   "version": "0.0.0",
   "description": "Blog Platform built on Handlebars",
   "repository": {
