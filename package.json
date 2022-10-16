@@ -1,19 +1,18 @@
 {
-  "name": "handleblog",
+  "name": "@streetlight-tech/handleblog",
   "version": "0.0.0",
   "description": "Blog Platform built on Handlebars",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/streetlight-tech/handleblog.git"
   },
-  "author": "",
-  "private": true,
+  "author": "Streetlight Technologies",
   "bugs": {
     "url": "https://github.com/streetlight-tech/handleblog/issues"
   },
   "homepage": "https://github.com/streetlight-tech/handleblog#readme",
   "scripts": {
-    "build": "tsc --project tsconfig.json --diagnostics && tsconfig-replace-paths --project tsconfig.json",
+    "build": "tsc --project tsconfig.json --diagnostics",
     "test": "jest --verbose --testPathPattern=\\.spec\\.ts --coverage",
     "test:one": "jest --verbose",
     "test:nocover": "jest --verbose --testPathPattern=\\.spec\\.ts"
