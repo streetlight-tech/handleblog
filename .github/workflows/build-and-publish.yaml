@@ -1,0 +1,41 @@
+name: Build and Publish
+
+on:
+  workflow_call:
+    inputs:
+      versionTag:
+        required: true
+        type: string
+    secrets:
+      npmToken:
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install Dependencies
+        run: yarn
+      - name: Test
+        run: yarn run test
+  
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Update version
+        run: npm version --tag ${{ inputs.verstionTag }}
+      - name: Install clean modules
+        run: yarn install --frozen-lockfile
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npmToken }}
