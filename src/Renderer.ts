@@ -23,8 +23,6 @@ export class Renderer {
   }
 
   public async render<T>(template: string, content: T): Promise<string> {
-    console.log(content);
-    
     const compiled = Handlebars.compile(template);
 
     return compiled(content);
