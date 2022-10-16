@@ -32,10 +32,10 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Update version
-        run: npm version --no-git-tag-version prerelease --preid ${{ inputs.verstionTag }}
+        run: npm version --no-git-tag-version prerelease --preid ${{ inputs.versionTag }}
       - name: Install clean modules
         run: yarn install --frozen-lockfile
       - name: Publish
-        run: npm publish --tag ${{ inputs.verstionTag }} 
+        run: npm publish --tag ${{ inputs.versionTag }} 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npmToken }}
