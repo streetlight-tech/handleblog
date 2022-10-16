@@ -601,6 +601,11 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
+"@types/marked@^4.0.7":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-4.0.7.tgz#400a76809fd08c2bbd9e25f3be06ea38c8e0a1d3"
+  integrity sha512-eEAhnz21CwvKVW+YvRvcTuFKNU9CV1qH+opcgVK3pIMI6YZzDm6gc8o2vHjldFk6MGKt5pueSB7IOpvpx5Qekw==
+
 "@types/node@*":
   version "18.11.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.0.tgz#f38c7139247a1d619f6cc6f27b072606af7c289d"
@@ -1933,6 +1938,11 @@ makeerror@1.0.12:
   integrity sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==
   dependencies:
     tmpl "1.0.5"
+
+marked@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.1.1.tgz#2f709a4462abf65a283f2453dc1c42ab177d302e"
+  integrity sha512-0cNMnTcUJPxbA6uWmCmjWz4NJRe/0Xfk2NhXCUHjew9qJzFN20krFnsUe7QynwqOwa5m1fZ4UDg0ycKFVC0ccw==
 
 merge-stream@^2.0.0:
   version "2.0.0"
