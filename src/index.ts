@@ -1,3 +1,4 @@
+export * from './IContentProvider';
 export * from './IPageConfig';
 export * from './IPost';
 export * from './IPostProvider';
