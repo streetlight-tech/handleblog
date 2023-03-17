@@ -1,4 +1,4 @@
-import { IContentProvider, IPost, IPostProvider } from './index';
+import { IContentProvider, IPost, IPostProvider, IPostQuery } from './index';
 
 export class AdminService {
   private postProvider: IPostProvider;
@@ -7,6 +7,10 @@ export class AdminService {
   constructor(postProvider: IPostProvider, contentProvider: IContentProvider) {
     this.postProvider = postProvider;
     this.contentProvider = contentProvider;
+  }
+
+  public async listPosts(query: IPostQuery): Promise<void> {
+    await this.postProvider.list(query);
   }
 
   public async save(post: IPost): Promise<void> {
