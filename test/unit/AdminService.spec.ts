@@ -23,9 +23,21 @@ describe('AdminService', () => {
     it('should call list', async() => {
       const adminService = new AdminService(postProvider, contentProvider);
 
-      await adminService.listPosts();
+      mockListPosts.mockResolvedValueOnce([{
+        key: 'foo',
+        title: 'Title',
+        body: 'Body',
+      }]);
+
+      const posts = await adminService.listPosts();
 
       expect(mockListPosts).toHaveBeenCalledWith(undefined);
+
+      expect(posts).toEqual([{
+        key: 'foo',
+        title: 'Title',
+        body: 'Body',
+      }])
     });
   });
 
