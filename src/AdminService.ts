@@ -9,8 +9,8 @@ export class AdminService {
     this.contentProvider = contentProvider;
   }
 
-  public async listPosts(query?: IPostQuery): Promise<void> {
-    await this.postProvider.list(query);
+  public async listPosts(query?: IPostQuery): Promise<IPost[]> {
+    return this.postProvider.list(query);
   }
 
   public async save(post: IPost): Promise<void> {
