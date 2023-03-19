@@ -1,15 +1,16 @@
 import { AdminService, IContentProvider, IPost, IPostProvider, Renderer } from '../../src/index';
 import { IPostQuery } from '../../src/IPostQuery';
 
+const mockGetPost = jest.fn();
 const mockSave = jest.fn();
 const mockListPosts = jest.fn();
 const mockList = jest.fn();
 const mockGetUploadUrl = jest.fn();
 
 const postProvider: IPostProvider = {
+  get: mockGetPost,
   save: mockSave,
   list: mockListPosts,
-  get: jest.fn(),
 };
 
 const contentProvider: IContentProvider = {
@@ -19,6 +20,28 @@ const contentProvider: IContentProvider = {
 };
 
 describe('AdminService', () => {
+  describe('getPost()', () => {
+    it('should call get', async() => {
+      const adminService = new AdminService(postProvider, contentProvider);
+
+      mockGetPost.mockResolvedValueOnce({
+        key: 'foo',
+        title: 'Title',
+        body: 'Body',
+      });
+
+      const posts = await adminService.getPost('foo');
+
+      expect(mockGetPost).toHaveBeenCalledWith('foo');
+
+      expect(posts).toEqual({
+        key: 'foo',
+        title: 'Title',
+        body: 'Body',
+      })
+    });
+  });
+
   describe('listPosts()', () => {
     it('should call list', async() => {
       const adminService = new AdminService(postProvider, contentProvider);

@@ -13,6 +13,10 @@ export class AdminService {
     return this.postProvider.list(query);
   }
 
+  public async getPost(key: string): Promise<IPost> {
+    return this.postProvider.get(key);
+  }
+
   public async save(post: IPost): Promise<void> {
     await this.postProvider.save(post);
   }
