@@ -29,7 +29,7 @@ export class Renderer {
     const template = await this.templateProvider.getHomeTemplate();
     const posts = await this.postProvider.list(query);
 
-    posts.map(p => Renderer.parseBody(p));
+    posts.map(p => this.parseBody(p));
 
     return this.render(template, { 
       posts, 
@@ -41,7 +41,7 @@ export class Renderer {
     const template = await this.templateProvider.getListTemplate();
     const posts = await this.postProvider.list(query);
 
-    posts.map(p => Renderer.parseBody(p));
+    posts.map(p => this.parseBody(p));
 
     return this.render(template, { 
       posts, 
@@ -53,7 +53,7 @@ export class Renderer {
     const template = await this.templateProvider.getPostTemplate();
     const post = await this.postProvider.get(key);
 
-    Renderer.parseBody(post);
+    this.parseBody(post);
 
     return this.render(template, {
       ...post,
@@ -61,8 +61,19 @@ export class Renderer {
     });
   }
 
-  public static parseBody(post: IPost) {
+  public parseBody(post: IPost) {
     if (post.body) {
+      const contentRoot = this.pageConfig.contentRoot;
+      const renderer = {
+        image(href: string, title: string, text: string) {
+          return `<img src="${contentRoot}/${href}" alt="${text}" />`;
+        },
+      }
+
+      marked.use({
+        renderer,
+      });
+
       post.body = marked.parse(post.body);
     }
   }

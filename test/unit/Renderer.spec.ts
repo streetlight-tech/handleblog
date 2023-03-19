@@ -227,7 +227,7 @@ describe('Renderer', () => {
             title: 'Blog post 1',
             author: 'Bloggy Blogerton',
             date: new Date(2000, 0, 1).toLocaleDateString('en-us'),
-            body: 'This is a blog post',
+            body: 'This is a blog post with an image ![image](image.png)',
             category: 'Posts about Blogs',
             tags: [ 'blog', 'post' ],
           });
@@ -249,7 +249,7 @@ describe('Renderer', () => {
       mockGetPost.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
       const result = await renderer.renderPost('post-1');
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]');
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
     });
   });
 });
