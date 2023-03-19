@@ -25,7 +25,7 @@ export class AdminService {
     return this.contentProvider.list();
   }
 
-  public async getUploadUrl(key: string): Promise<string> {
-    return this.contentProvider.getUploadUrl(key);
+  public async getUploadUrl(key: string, contentType?: string): Promise<string> {
+    return this.contentProvider.getUploadUrl(key, contentType);
   }
 }

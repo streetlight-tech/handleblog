@@ -88,9 +88,9 @@ describe('AdminService', () => {
     it('should call getUploadUrl', async() => {
       const adminService = new AdminService(postProvider, contentProvider);
 
-      await adminService.getUploadUrl('image.png');
+      await adminService.getUploadUrl('image.png', 'image/png');
 
-      expect(mockGetUploadUrl).toHaveBeenCalledWith('image.png');
+      expect(mockGetUploadUrl).toHaveBeenCalledWith('image.png', 'image/png');
     });
 
   });
