@@ -43,7 +43,7 @@ describe('Renderer', () => {
   });
 
   describe('renderHome()', () => {
-    it('should render template with all post fields', async() => {
+    it('should render template with all post fields and handle invalid dates', async() => {
       const postProvider: IPostProvider = {
         list: (query?: IPostQuery): Promise<IPost[]> => {
           return Promise.resolve([
@@ -60,7 +60,7 @@ describe('Renderer', () => {
               key: 'post-2',
               title: 'Blog post 2',
               author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 2).toLocaleDateString('en-us'),
+              date: 'Invalid Date',
               body: 'This is another blog post',
               category: 'Posts about Blogs',
               tags: [ 'blog', 'post' ],
@@ -87,7 +87,7 @@ describe('Renderer', () => {
       mockGetHome.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
       const result = await renderer.renderHome();
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Invalid Date::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
     });
 
     it('should render list with minimum post fields', async() => {

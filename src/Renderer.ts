@@ -75,6 +75,10 @@ export class Renderer {
       day: 'numeric',
     };
     
-    return (new Intl.DateTimeFormat('en-US', options)).format(dateValue);
+    try {
+      return (new Intl.DateTimeFormat('en-US', options)).format(dateValue);
+    } catch {
+      return date;
+    }
   }
 }
