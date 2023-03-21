@@ -7,9 +7,11 @@ const mockGetList = jest.fn();
 const mockGetPost = jest.fn();
 
 const templateProvider: ITemplateProvider = {
+  getTemplate: jest.fn(),
   getHomeTemplate: mockGetHome,
   getListTemplate: mockGetList,
   getPostTemplate: mockGetPost,
+  getUploadUrl: jest.fn(),
 };
 
 describe('Renderer', () => {

@@ -1,4 +1,4 @@
-import { AdminService, IContentProvider, IPost, IPostProvider, Renderer } from '../../src/index';
+import { AdminService, IContentProvider, IPost, IPostProvider, ITemplateProvider, Renderer } from '../../src/index';
 import { IPostQuery } from '../../src/IPostQuery';
 
 const mockGetPost = jest.fn();
@@ -6,6 +6,7 @@ const mockSave = jest.fn();
 const mockListPosts = jest.fn();
 const mockList = jest.fn();
 const mockGetUploadUrl = jest.fn();
+const mockGetTemplate = jest.fn();
 
 const postProvider: IPostProvider = {
   get: mockGetPost,
@@ -19,10 +20,18 @@ const contentProvider: IContentProvider = {
   save: jest.fn(),
 };
 
+const templateProvider: ITemplateProvider = {
+  getTemplate: mockGetTemplate,
+  getHomeTemplate: jest.fn(),
+  getListTemplate: jest.fn(),
+  getPostTemplate: jest.fn(),
+  getUploadUrl: mockGetUploadUrl,
+};
+
 describe('AdminService', () => {
   describe('getPost()', () => {
     it('should call get', async() => {
-      const adminService = new AdminService(postProvider, contentProvider);
+      const adminService = new AdminService(postProvider, contentProvider, templateProvider);
 
       mockGetPost.mockResolvedValueOnce({
         key: 'foo',
@@ -44,7 +53,7 @@ describe('AdminService', () => {
 
   describe('listPosts()', () => {
     it('should call list', async() => {
-      const adminService = new AdminService(postProvider, contentProvider);
+      const adminService = new AdminService(postProvider, contentProvider, templateProvider);
 
       mockListPosts.mockResolvedValueOnce([{
         key: 'foo',
@@ -66,7 +75,7 @@ describe('AdminService', () => {
 
   describe('save()', () => {
     it('should call save', async() => {
-      const adminService = new AdminService(postProvider, contentProvider);
+      const adminService = new AdminService(postProvider, contentProvider, templateProvider);
 
       await adminService.save({ key: 'foo', title: 'title' });
 
@@ -76,7 +85,7 @@ describe('AdminService', () => {
 
   describe('listContent()', () => {
     it('should call list', async() => {
-      const adminService = new AdminService(postProvider, contentProvider);
+      const adminService = new AdminService(postProvider, contentProvider, templateProvider);
 
       await adminService.listContent();
 
@@ -84,13 +93,13 @@ describe('AdminService', () => {
     });
   });
 
-  describe('getUploadUrl()', () => {
+  describe('getTemplateUploadUrl()', () => {
     it('should call getUploadUrl', async() => {
-      const adminService = new AdminService(postProvider, contentProvider);
+      const adminService = new AdminService(postProvider, contentProvider, templateProvider);
 
-      await adminService.getUploadUrl('image.png', 'image/png');
+      await adminService.getTemplateUploadUrl('home');
 
-      expect(mockGetUploadUrl).toHaveBeenCalledWith('image.png', 'image/png');
+      expect(mockGetUploadUrl).toHaveBeenCalledWith('home');
     });
 
   });

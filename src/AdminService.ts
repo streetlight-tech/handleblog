@@ -1,12 +1,14 @@
-import { IContentProvider, IPost, IPostProvider, IPostQuery } from './index';
+import { IContentProvider, IPost, IPostProvider, IPostQuery, ITemplateProvider } from './index';
 
 export class AdminService {
   private postProvider: IPostProvider;
   private contentProvider: IContentProvider;
+  private templateProvider: ITemplateProvider;
 
-  constructor(postProvider: IPostProvider, contentProvider: IContentProvider) {
+  constructor(postProvider: IPostProvider, contentProvider: IContentProvider, templateProvider: ITemplateProvider) {
     this.postProvider = postProvider;
     this.contentProvider = contentProvider;
+    this.templateProvider = templateProvider;
   }
 
   public async listPosts(query?: IPostQuery): Promise<IPost[]> {
@@ -27,5 +29,13 @@ export class AdminService {
 
   public async getUploadUrl(key: string, contentType?: string): Promise<string> {
     return this.contentProvider.getUploadUrl(key, contentType);
+  }
+
+  public async getTemplate(type: string): Promise<string> {
+    return this.templateProvider.getTemplate(type);
+  }
+
+  public async getTemplateUploadUrl(type: string): Promise<string> {
+    return this.templateProvider.getUploadUrl(type);
   }
 }
