@@ -1,6 +1,10 @@
-import { IPost, IPostProvider, Renderer } from '../../src/index';
-import { IPostQuery } from '../../src/IPostQuery';
-import { ITemplateProvider } from '../../src/ITemplateProvider';
+import { 
+  IPost, 
+  IPostProvider, 
+  IPostQuery, 
+  ITemplateProvider, 
+  Renderer 
+} from '../../src/index';
 
 const mockGetHome = jest.fn();
 const mockGetList = jest.fn();

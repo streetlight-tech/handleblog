@@ -6,4 +6,6 @@ export * from './IPostQuery';
 export * from './IRendererOptions';
 export * from './ISocialLink';
 export * from './ITemplateProvider';
+export * from './DateHelper';
+export * from './PostJson';
 export * from './Renderer';
