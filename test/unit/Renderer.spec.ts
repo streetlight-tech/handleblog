@@ -257,4 +257,104 @@ describe('Renderer', () => {
       expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
     });
   });
+
+  describe('stripMarkdown', () => {
+    it('should remove formatting', () => {
+      const input = '![image](image.png) **bold** *italics* `some code` and a [link](https://here.com)';
+
+      const stripped = Renderer.stripMarkdown(input);
+
+      expect(stripped).toBe(' (image: image) bold italics some code and a link');
+    });
+
+    it('should remove header formatting', () => {
+      const input = '## Heading';
+
+      const stripped = Renderer.stripMarkdown(input);
+
+      expect(stripped).toBe('Heading');
+    });
+
+    it('should remove block quote formatting', () => {
+      const input = '> Block quote';
+
+      const stripped = Renderer.stripMarkdown(input);
+
+      expect(stripped).toBe('Block quote');
+    });
+
+    it('should remove lists', () => {
+      const input = `Here is a list:
+
+- And
+- This
+- Is
+- A
+- List
+
+That is the list.`;
+
+      const excerpt = Renderer.getExcerpt(input);
+
+      expect(excerpt).toBe('Here is a list: (list) That is the list.');
+    });
+
+    it('should remove code', () => {
+      const input = `Here is a code sample:
+
+    10 print 'hello world'
+    20 goto 10
+
+  That is the code.`;
+
+      const excerpt = Renderer.getExcerpt(input);
+
+      expect(excerpt).toBe('Here is a code sample: (code sample) That is the code.');
+    });
+  });
+
+  describe('getExcerpt', () => {
+
+    it('should not trim if less than the limit', () => {
+      const input = 'nothingtotrimherebutitshouldntmatter';
+
+      const excerpt = Renderer.getExcerpt(input);
+
+      expect(excerpt).toBe('nothingtotrimherebutitshouldntmatter');
+    });
+
+    it('should trim at a sentence', () => {
+      const input = `This is some long text. And here is another sentence. Now here is some more text to fill up the
+      character imit. Now here is some more text to fill up the character imit. Now here is some more text to fill up
+      the character imit. Now here is some more text to fill up the character imit. Now here is some more text to fill
+      up the character imit. Now here is some more text to fill up the character imit. Now here is some more text to
+      fill up the character imit. Now here is some more text to fill up the character imit. Now here is some more text
+      to fill up the character imit. Now here is some more text to fill up the character imit.`;
+
+      const excerpt = Renderer.getExcerpt(input);
+
+      expect(excerpt).toBe('This is some long text. And here is another sentence. Now here is some more text to fill up the ' +
+          'character imit. Now here is some more text to fill up the character imit. Now here is some more text to fill up ' +
+          'the character imit. Now here is some more text to fill up the character imit. Now here is some more text to fill ' +
+          'up the character imit. Now here is some more text to fill up the character imit. Now here is some more text to ' +
+          'fill up the character imit.');
+    });
+
+    it('should trim at a space if there is no period within the limit', () => {
+      const input = `This is some long text And here is another sentence Now here is some more text to fill up the
+      character imit Now here is some more text to fill up the character imit Now here is some more text to fill up
+      the character imit Now here is some more text to fill up the character imit Now here is some more text to fill
+      up the character imit Now here is some more text to fill up the character imit Now here is some more text to
+      fill up the character imit Now here is some more text to fill up the character imit Now here is some more text
+      to fill up the character imit Now here is some more text to fill up the character imit`;
+
+      const excerpt = Renderer.getExcerpt(input);
+
+      expect(excerpt).toBe('This is some long text And here is another sentence Now here is some more text to fill up ' +
+        'the character imit Now here is some more text to fill up the character imit Now here is some more text to ' +
+        'fill up the character imit Now here is some more text to fill up the character imit Now here is some more ' +
+        'text to fill up the character imit Now here is some more text to fill up the character imit Now here is some ' +
+        'more text to fill up the character imit Now here is some more text to fill up the ');
+    });
+  });
 });

@@ -6,6 +6,7 @@ export class PostJson {
   public author: string;
   public date: string;
   public body: string;
+  public excerpt: string;
   public imageUrl: string;
   public category: string;
   public tags: string[];

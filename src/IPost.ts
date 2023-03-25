@@ -4,6 +4,7 @@ export interface IPost {
   author?: string;
   date?: Date;
   body?: string;
+  excerpt?: string;
   imageUrl?: string;
   category?: string;
   tags?: string[];

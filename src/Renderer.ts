@@ -78,7 +78,7 @@ export class Renderer {
     }
   }
 
-  public formatDate(date: string) {
+  public formatDate(date: string): string {
     const dateValue = new Date(date);
     const options: Intl.DateTimeFormatOptions = { 
       year: 'numeric', 
@@ -91,5 +91,71 @@ export class Renderer {
     } catch {
       return date;
     }
+  }
+
+  public static stripMarkdown(text: string) {
+
+    const renderer = {
+      code() {
+        return ' (code sample) ';
+      },
+      blockquote(quote: string) {
+        return quote;
+      },
+      heading(text: string) {
+        return text;
+      },
+      list() {
+        return ' (list) ';
+      },
+      paragraph(text: string) {
+        return text;
+      },
+      image(href: string, title: string, text: string) {
+        return ` (image: ${text}) `;
+      },
+      strong(text: string) {
+        return text;
+      },
+      em(text: string) {
+        return text;
+      },
+      codespan(code: string) {
+        return code;
+      },
+      link(href: string, title: string, text: string) {
+        return text;
+      },
+    }
+
+    marked.use({
+      renderer,
+    });
+
+    const plainText = marked.parse(text);
+
+    const spaces = new RegExp(/\s+/g);
+
+    return plainText.replace(spaces, ' ');
+  }
+
+  public static getExcerpt(body: string): string {
+    const maxLength = 500;
+
+    const plainText = Renderer.stripMarkdown(body);
+
+    if (plainText.length <= maxLength) {
+      return plainText;
+    }
+
+    const trimmed = plainText.substring(0, maxLength);
+
+    let index = trimmed.lastIndexOf('.');
+
+    if (index < maxLength - 400) {
+      index = trimmed.lastIndexOf(' ');
+    }
+    
+    return trimmed.substring(0, index + 1);
   }
 }
