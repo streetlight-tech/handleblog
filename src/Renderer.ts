@@ -99,7 +99,7 @@ export class Renderer {
   public static stripMarkdown(text: string) {
 
     const renderer = {
-      defaultRenderer,
+      ...defaultRenderer,
       code() {
         return ' (code sample) ';
       },
