@@ -1,11 +1,13 @@
 import Handlebars from 'handlebars';
-import { marked } from 'marked';
+import { marked, Renderer as MDRenderer } from 'marked';
 import { IPageConfig } from './IPageConfig';
 import { IPostProvider } from './IPostProvider';
 import { IPost } from './IPost';
 import { IRendererOptions } from './IRendererOptions';
 import { ITemplateProvider } from './ITemplateProvider';
 import { IPostQuery } from './IPostQuery';
+
+const defaultRenderer = new MDRenderer();
 
 export class Renderer {
   private postProvider: IPostProvider;
@@ -61,6 +63,7 @@ export class Renderer {
     if (post.body) {
       const contentRoot = this.pageConfig.contentRoot;
       const renderer = {
+        ...defaultRenderer,
         image(href: string, title: string, text: string) {
           return `<img src="${contentRoot}/${href}" alt="${text}" />`;
         },
@@ -71,6 +74,10 @@ export class Renderer {
       });
 
       post.body = marked.parse(post.body);
+
+      marked.use({
+        renderer: new MDRenderer(),
+      });
     }
   }
 
@@ -92,6 +99,7 @@ export class Renderer {
   public static stripMarkdown(text: string) {
 
     const renderer = {
+      defaultRenderer,
       code() {
         return ' (code sample) ';
       },
