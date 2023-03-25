@@ -29,8 +29,6 @@ export class Renderer {
     const template = await this.templateProvider.getHomeTemplate();
     const posts = await this.postProvider.list(query);
 
-    posts.map(p => this.parseBody(p));
-
     return this.render(template, { 
       posts, 
       ...this.pageConfig,
@@ -40,8 +38,6 @@ export class Renderer {
   public async renderList<T>(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getListTemplate();
     const posts = await this.postProvider.list(query);
-
-    posts.map(p => this.parseBody(p));
 
     return this.render(template, { 
       posts, 
