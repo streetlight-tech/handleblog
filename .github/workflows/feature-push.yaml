@@ -1,0 +1,15 @@
+name: Feature Push
+
+on:
+  push:
+    branches:
+      - '[0-9]+-**'
+
+jobs:
+  build-and-publish:
+    name: Build and Publish Alpha
+    uses: ./.github/workflows/build-and-publish.yaml
+    with:
+      versionTag: alpha.${{ github.run_id}}${{ github.run_attempt }}
+    secrets:
+      npmToken: ${{ secrets.NPM_TOKEN }}
