@@ -280,34 +280,7 @@ describe('Renderer', () => {
               tags: [ 'blog', 'post' ],
             }
           ]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
-
-
-      mockGetList.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
-      const result = await renderer.renderList();
-
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
-
-      const postProvider: IPostProvider = {
-        list: () => {
-          return Promise.resolve([]);
-        },
+        } ,
         get: (key) => {
           return Promise.resolve({
             key,
@@ -332,7 +305,13 @@ describe('Renderer', () => {
           social: [],
         } 
       });
-      
+
+
+      mockGetList.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+      const result = await renderer.renderList();
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
+   
       mockGetPost.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
       const result = await renderer.renderPost('post-1');
 
