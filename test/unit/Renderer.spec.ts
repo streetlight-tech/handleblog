@@ -6,318 +6,100 @@ import {
   Renderer 
 } from '../../src/index';
 
-const mockGetHome = jest.fn();
-const mockGetList = jest.fn();
-const mockGetPost = jest.fn();
+const mockGetHomeTemplate = jest.fn();
+const mockGetListTemplate = jest.fn();
+const mockGetPostTemplate = jest.fn();
 
 const templateProvider: ITemplateProvider = {
   getTemplate: jest.fn(),
-  getHomeTemplate: mockGetHome,
-  getListTemplate: mockGetList,
-  getPostTemplate: mockGetPost,
+  getHomeTemplate: mockGetHomeTemplate,
+  getListTemplate: mockGetListTemplate,
+  getPostTemplate: mockGetPostTemplate,
   getUploadUrl: jest.fn(),
 };
+
+const mockListPosts = jest.fn();
+const mockGetPost = jest.fn();
+
+const postProvider: IPostProvider = {
+  list: mockListPosts,
+  get: mockGetPost,
+  save: jest.fn(),
+};
+
+const renderer = new Renderer({ 
+  postProvider, 
+  templateProvider,
+  pageConfig: {
+    pageTitle: 'Title',
+    root: 'https://here.com',
+    contentRoot: 'https://content.here.com',
+    social: [],
+  } 
+});
 
 describe('Renderer', () => {
   describe('render()', () => {
     it('should render template with content', async() => {
-      const postProvider: IPostProvider = {
-        list: () => {
-          return Promise.resolve([]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
-
       const result = await renderer.render('Handlebars <b>{{doesWhat}}</b> compiled!', { doesWhat: 'rocks!' });
 
       expect(result).toBe('Handlebars <b>rocks!</b> compiled!');
     });
   });
 
-  describe('renderHome()', () => {
-    it('should render template with all post fields and handle missing dates', async() => {
-      const postProvider: IPostProvider = {
-        list: (query?: IPostQuery): Promise<IPost[]> => {
-          return Promise.resolve([
-            {
-              key: 'post-1',
-              title: 'Blog post 1',
-              author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 1),
-              body: 'This is a blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            },
-            {
-              key: 'post-2',
-              title: 'Blog post 2',
-              author: 'Bloggy Blogerton',
-              body: 'This is another blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            }
-          ]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
+  describe('parseBody', () => {
+    it('should parse markdown', () => {
+      const body = `# Heading
 
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
+\`\`\`
+source
+\`\`\`
 
-      mockGetHome.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
-      const result = await renderer.renderHome();
+|Table|
+-------
+|Row  |
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
-    });
+- List
+- Items
 
-    it('should render list with minimum post fields', async() => {
-      const postProvider: IPostProvider = {
-        list: () => {
-          return Promise.resolve([
-            {
-              key: 'post-1',
-              title: 'Blog post 1',
-            },
-            {
-              key: 'post-2',
-              title: 'Blog post 2',
-            }
-          ]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
+1. Ordered
+2. List
 
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
+> Block Quote
 
-      mockGetList.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
-      const result = await renderer.renderList();
+[link](/link) ![image](image) **bold** *italics* ~~strikethrough~~ \`inline-code\``;
 
-      expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
-    });
-  });
-
-  describe('renderList()', () => {
-    it('should render template with all post fields', async() => {
-      const postProvider: IPostProvider = {
-        list: (query?: IPostQuery): Promise<IPost[]> => {
-          return Promise.resolve([
-            {
-              key: 'post-1',
-              title: 'Blog post 1',
-              author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 1),
-              body: 'This is a blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            },
-            {
-              key: 'post-2',
-              title: 'Blog post 2',
-              author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 2),
-              body: 'This is another blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            }
-          ]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
-
-
-      mockGetList.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
-      const result = await renderer.renderList();
-
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
-    });
-
-    it('should render list with minimum post fields', async() => {
-      const postProvider: IPostProvider = {
-        list: () => {
-          return Promise.resolve([
-            {
-              key: 'post-1',
-              title: 'Blog post 1',
-            },
-            {
-              key: 'post-2',
-              title: 'Blog post 2',
-            }
-          ]);
-        },
-        get: (key) => {
-          return Promise.resolve({ key, title: 'foo' });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
-
-      mockGetList.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
-      const result = await renderer.renderList();
-
-      expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
-    });
-  });
-
-  describe('renderPost()', () => {
-    it('should render a single post', async() => {
-      const postProvider: IPostProvider = {
-        list: () => {
-          return Promise.resolve([]);
-        },
-        get: (key) => {
-          return Promise.resolve({
-            key,
-            title: 'Blog post 1',
-            author: 'Bloggy Blogerton',
-            date: new Date(2000, 0, 1),
-            body: 'This is a blog post with an image ![image](image.png)',
-            category: 'Posts about Blogs',
-            tags: [ 'blog', 'post' ],
-          });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
+      const post: IPost = { key: 'key', title: 'title', body };
       
-      mockGetPost.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
-      const result = await renderer.renderPost('post-1');
+      renderer.parseBody(post);
 
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
+      expect(post.body).toEqual(`<h1 id=\"heading\">Heading</h1>
+<pre><code>source
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Row</td>
+</tr>
+</tbody></table>
+<ul>
+<li>List</li>
+<li>Items</li>
+</ul>
+<ol>
+<li>Ordered</li>
+<li>List</li>
+</ol>
+<blockquote>
+<p>Block Quote</p>
+</blockquote>
+<p><a href=\"/link\">link</a> <img src=\"https://content.here.com/image\" alt=\"image\" /> <strong>bold</strong> <em>italics</em> <del>strikethrough</del> <code>inline-code</code></p>
+`);
     });
-
-    it('should render a single post even afte list', async() => {
-      const postProvider: IPostProvider = {
-        list: (query?: IPostQuery): Promise<IPost[]> => {
-          return Promise.resolve([
-            {
-              key: 'post-1',
-              title: 'Blog post 1',
-              author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 1),
-              body: 'This is a blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            },
-            {
-              key: 'post-2',
-              title: 'Blog post 2',
-              author: 'Bloggy Blogerton',
-              date: new Date(2000, 0, 2),
-              body: 'This is another blog post',
-              category: 'Posts about Blogs',
-              tags: [ 'blog', 'post' ],
-            }
-          ]);
-        } ,
-        get: (key) => {
-          return Promise.resolve({
-            key,
-            title: 'Blog post 1',
-            author: 'Bloggy Blogerton',
-            date: new Date(2000, 0, 1),
-            body: 'This is a blog post with an image ![image](image.png)',
-            category: 'Posts about Blogs',
-            tags: [ 'blog', 'post' ],
-          });
-        },
-        save: () => { return Promise.resolve(); },
-      };
-
-      const renderer = new Renderer({ 
-        postProvider, 
-        templateProvider,
-        pageConfig: {
-          pageTitle: 'Title',
-          root: 'https://here.com',
-          contentRoot: 'https://content.here.com',
-          social: [],
-        } 
-      });
-
-
-      mockGetList.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
-      const listResult = await renderer.renderList();
-
-      expect(listResult).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
-   
-      mockGetPost.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
-      const result = await renderer.renderPost('post-1');
-
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
-    });
-
   });
 
   describe('stripMarkdown', () => {
@@ -373,6 +155,164 @@ That is the list.`;
 
       expect(excerpt).toBe('Here is a code sample: (code sample) That is the code.');
     });
+  });
+
+  describe('renderHome()', () => {
+    it('should render template with all post fields and handle missing dates', async() => {
+      mockListPosts.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 1),
+          excerpt: 'This is a blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+          author: 'Bloggy Blogerton',
+          excerpt: 'This is another blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        }
+      ]);
+
+      mockGetHomeTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{excerpt}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+      const result = await renderer.renderHome();
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:::This is another blog post/Posts about Blogs[blog,post,]');
+    });
+
+    it('should render list with minimum post fields', async() => {
+      mockListPosts.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+        }
+      ]);
+
+      mockGetListTemplate.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
+      const result = await renderer.renderList();
+
+      expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
+    });
+  });
+
+  describe('renderList()', () => {
+    it('should render template with all post fields', async() => {
+      mockListPosts.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 1),
+          excerpt: 'This is a blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 2),
+          excerpt: 'This is another blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        }
+      ]);
+
+      mockGetListTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{excerpt}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+      const result = await renderer.renderList();
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::This is another blog post/Posts about Blogs[blog,post,]');
+    });
+
+    it('should render list with minimum post fields', async() => {
+      mockListPosts.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+        }
+      ]);
+
+      mockGetListTemplate.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
+      const result = await renderer.renderList();
+
+      expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
+    });
+  });
+
+  describe('renderPost()', () => {
+    it('should render a single post', async() => {
+      mockGetPost.mockResolvedValueOnce({
+        key: 'post-1',
+        title: 'Blog post 1',
+        author: 'Bloggy Blogerton',
+        date: new Date(2000, 0, 1),
+        body: 'This is a blog post with an image ![image](image.png)',
+        category: 'Posts about Blogs',
+        tags: [ 'blog', 'post' ],
+      });
+      
+      mockGetPostTemplate.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
+      const result = await renderer.renderPost('post-1');
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
+    });
+
+    it('should render a single post even after list is called', async() => {
+      mockListPosts.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 1),
+          excerpt: 'This is a blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 2),
+          excerpt: 'This is another blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        }
+      ]);
+
+      mockGetPost.mockResolvedValueOnce({
+        key: 'post-1',
+        title: 'Blog post 1',
+        author: 'Bloggy Blogerton',
+        date: new Date(2000, 0, 1),
+        body: 'This is a blog post with an image ![image](image.png)',
+        category: 'Posts about Blogs',
+        tags: [ 'blog', 'post' ],
+      });
+
+      mockGetListTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{excerpt}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+      const listResult = await renderer.renderList();
+
+      expect(listResult).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::This is another blog post/Posts about Blogs[blog,post,]');
+   
+      mockGetPostTemplate.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
+      const result = await renderer.renderPost('post-1');
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
+    });
+
   });
 
   describe('getExcerpt', () => {
