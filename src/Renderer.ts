@@ -7,18 +7,56 @@ import { IRendererOptions } from './IRendererOptions';
 import { ITemplateProvider } from './ITemplateProvider';
 import { IPostQuery } from './IPostQuery';
 
-const defaultRenderer = new MDRenderer();
+const excerptRenderer = Object.assign(new MDRenderer(), {
+  code() {
+    return ' (code sample) ';
+  },
+  blockquote(quote: string) {
+    return quote;
+  },
+  heading(text: string) {
+    return text;
+  },
+  list() {
+    return ' (list) ';
+  },
+  paragraph(text: string) {
+    return text;
+  },
+  image(href: string, title: string, text: string) {
+    return ` (image: ${text}) `;
+  },
+  strong(text: string) {
+    return text;
+  },
+  em(text: string) {
+    return text;
+  },
+  codespan(code: string) {
+    return code;
+  },
+  link(href: string, title: string, text: string) {
+    return text;
+  },
+});
 
 export class Renderer {
   private postProvider: IPostProvider;
   private templateProvider: ITemplateProvider;
   private pageConfig: IPageConfig;
+  private bodyRenderer: MDRenderer;
 
   constructor(options: IRendererOptions) {
     this.postProvider = options.postProvider;
     this.templateProvider = options.templateProvider;
     this.pageConfig = options.pageConfig;
-    Handlebars.registerHelper('formatDate', this.formatDate)
+    this.bodyRenderer = Object.assign(new MDRenderer(), {
+      image(href: string, title: string, text: string) {
+        return `<img src="${options.pageConfig.contentRoot}/${href}" alt="${text}" />`;
+      },
+    });
+
+    Handlebars.registerHelper('formatDate', this.formatDate);
   }
 
   public async render<T>(template: string, content: T): Promise<string> {
@@ -61,23 +99,8 @@ export class Renderer {
 
   public parseBody(post: IPost) {
     if (post.body) {
-      const contentRoot = this.pageConfig.contentRoot;
-      const renderer = {
-        ...defaultRenderer,
-        image(href: string, title: string, text: string) {
-          return `<img src="${contentRoot}/${href}" alt="${text}" />`;
-        },
-      }
-
-      marked.use({
-        renderer,
-      });
-
+      marked.defaults.renderer = this.bodyRenderer;
       post.body = marked.parse(post.body);
-
-      marked.use({
-        renderer: new MDRenderer(),
-      });
     }
   }
 
@@ -97,45 +120,7 @@ export class Renderer {
   }
 
   public static stripMarkdown(text: string) {
-
-    const renderer = {
-      ...defaultRenderer,
-      code() {
-        return ' (code sample) ';
-      },
-      blockquote(quote: string) {
-        return quote;
-      },
-      heading(text: string) {
-        return text;
-      },
-      list() {
-        return ' (list) ';
-      },
-      paragraph(text: string) {
-        return text;
-      },
-      image(href: string, title: string, text: string) {
-        return ` (image: ${text}) `;
-      },
-      strong(text: string) {
-        return text;
-      },
-      em(text: string) {
-        return text;
-      },
-      codespan(code: string) {
-        return code;
-      },
-      link(href: string, title: string, text: string) {
-        return text;
-      },
-    }
-
-    marked.use({
-      renderer,
-    });
-
+    marked.defaults.renderer = excerptRenderer;
     const plainText = marked.parse(text);
 
     const spaces = new RegExp(/\s+/g);
