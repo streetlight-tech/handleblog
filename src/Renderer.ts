@@ -88,13 +88,13 @@ export class Renderer {
   public async renderPost(key: string): Promise<string> {
     const template = await this.templateProvider.getPostTemplate();
     if (!template) {
-      return undefined;
+      return;
     }
     
     const post = await this.postProvider.get(key);
 
     if (!post) {
-      return undefined;
+      return;
     }
 
     this.parseBody(post);
