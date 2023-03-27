@@ -89,6 +89,10 @@ export class Renderer {
     const template = await this.templateProvider.getPostTemplate();
     const post = await this.postProvider.get(key);
 
+    if (!post) {
+      return undefined;
+    }
+
     this.parseBody(post);
 
     return this.render(template, {
