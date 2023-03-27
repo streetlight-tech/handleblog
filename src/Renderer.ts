@@ -65,7 +65,7 @@ export class Renderer {
     return compiled(content);
   }
 
-  public async renderHome<T>(query?: IPostQuery): Promise<string> {
+  public async renderHome(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getHomeTemplate();
     const posts = await this.postProvider.list(query);
 
@@ -75,7 +75,7 @@ export class Renderer {
     });
   }
 
-  public async renderList<T>(query?: IPostQuery): Promise<string> {
+  public async renderList(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getListTemplate();
     const posts = await this.postProvider.list(query);
 
@@ -85,8 +85,12 @@ export class Renderer {
     });
   }
 
-  public async renderPost<T>(key: string): Promise<string> {
+  public async renderPost(key: string): Promise<string> {
     const template = await this.templateProvider.getPostTemplate();
+    if (!template) {
+      return undefined;
+    }
+    
     const post = await this.postProvider.get(key);
 
     if (!post) {
