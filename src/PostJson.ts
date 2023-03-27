@@ -7,7 +7,7 @@ export class PostJson {
   public date: string;
   public body: string;
   public excerpt: string;
-  public imageUrl: string;
+  public image: string;
   public category: string;
   public tags: string[];
 
