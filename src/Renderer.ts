@@ -41,9 +41,10 @@ const excerptRenderer = Object.assign(new MDRenderer(), {
 });
 
 export class Renderer {
+  public pageConfig: IPageConfig;
+  
   private postProvider: IPostProvider;
   private templateProvider: ITemplateProvider;
-  private pageConfig: IPageConfig;
   private bodyRenderer: MDRenderer;
 
   constructor(options: IRendererOptions) {
