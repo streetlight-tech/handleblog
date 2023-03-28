@@ -2,7 +2,7 @@ export interface IPost {
   key: string;
   title: string;
   author?: string;
-  date?: string;
+  date?: Date;
   body?: string;
   excerpt?: string;
   image?: string;

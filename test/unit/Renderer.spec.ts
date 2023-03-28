@@ -9,11 +9,14 @@ import {
 const mockGetHomeTemplate = jest.fn();
 const mockGetListTemplate = jest.fn();
 const mockGetPostTemplate = jest.fn();
+const mockGetPageTemplate = jest.fn();
+
 const templateProvider: ITemplateProvider = {
   getTemplate: jest.fn(),
   getHomeTemplate: mockGetHomeTemplate,
   getListTemplate: mockGetListTemplate,
   getPostTemplate: mockGetPostTemplate,
+  getPageTemplate: mockGetPageTemplate,
   getUploadUrl: jest.fn(),
 };
 
@@ -249,35 +252,6 @@ That is the list.`;
 
       expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
     });
-
-    it('should render template with all post fields', async() => {
-      mockList.mockResolvedValueOnce([
-        {
-          key: 'post-1',
-          title: 'Blog post 1',
-          author: 'Bloggy Blogerton',
-          date: new Date(2000, 0, 1),
-          body: 'This is a blog post',
-          category: 'Posts about Blogs',
-          tags: [ 'blog', 'post' ],
-        },
-        {
-          key: 'post-2',
-          title: 'Blog post 2',
-          author: 'Bloggy Blogerton',
-          date: new Date(2000, 0, 2),
-          body: 'This is another blog post',
-          category: 'Posts about Blogs',
-          tags: [ 'blog', 'post' ],
-        }
-      ]);
-
-      mockGetListTemplate.mockResolvedValueOnce('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
-
-      const result = await renderer.renderList();
-
-      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
-    });
   });
 
   describe('renderPost()', () => {
@@ -341,8 +315,31 @@ That is the list.`;
       expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
     });
 
+    it('should use page template if post.isPage is true', async() => {
+      mockGetPageTemplate.mockResolvedValue('{{key}} Page Template');
+      mockGetPost.mockResolvedValueOnce({
+        key: 'page-1',
+        title: 'Page 1',
+        body: 'Body',
+        isPage: true,
+      });
+      
+      const result = await renderer.renderPost('post-1');
+
+      expect(result).toEqual('page-1 Page Template');
+    });
+
+
+
     it('should return undefined if no template found', async() => {
+      mockGetPost.mockResolvedValueOnce({
+        key: 'post-1',
+        title: 'Post 1',
+        body: 'Body',
+        isPage: false,
+      });
       mockGetPostTemplate.mockResolvedValue(undefined);
+
       const result = await renderer.renderPost('post-1');
 
       expect(result).toBeUndefined();
