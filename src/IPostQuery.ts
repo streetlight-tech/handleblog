@@ -7,4 +7,5 @@ export interface IPostQuery {
   body?: string;
   category?: string;
   tags?: string[];
+  isPage?: boolean;
 }

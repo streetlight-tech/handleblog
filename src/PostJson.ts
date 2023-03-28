@@ -10,6 +10,7 @@ export class PostJson {
   public image: string;
   public category: string;
   public tags: string[];
+  public isPage: boolean;
 
   constructor(post?: IPost) {
     if (post) {

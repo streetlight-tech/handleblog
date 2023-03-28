@@ -11,6 +11,7 @@ describe('PostJson', () => {
         body: 'Body',
         category: 'Category',
         tags: [],
+        isPage: false,
       });
 
       expect(postJson).toEqual({
@@ -21,6 +22,7 @@ describe('PostJson', () => {
         body: 'Body',
         category: 'Category',
         tags: [],
+        isPage: false,
       });
     });
   });
@@ -38,6 +40,7 @@ describe('PostJson', () => {
           body: 'Body',
           category: 'Category',
           tags: [],
+          isPage: false,
         }
       );
 
@@ -51,6 +54,7 @@ describe('PostJson', () => {
         body: 'Body',
         category: 'Category',
         tags: [],
+        isPage: false,
       });
     });
   });

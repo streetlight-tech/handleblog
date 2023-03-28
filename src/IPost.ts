@@ -8,4 +8,5 @@ export interface IPost {
   image?: string;
   category?: string;
   tags?: string[];
+  isPage?: boolean;
 }
