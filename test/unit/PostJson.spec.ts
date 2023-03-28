@@ -1,13 +1,39 @@
 import { PostJson } from '../../src';
 
 describe('PostJson', () => {
-  describe('constructor', () => {
+  describe('fromPost', () => {
     it('parses an IPost', () => {
-      const postJson = new PostJson({
+      const postJson = PostJson.fromPost({
         key: 'Key',
         title: 'Title',
         author: 'Author',
         date: new Date('2023-01-01'),
+        body: 'Body',
+        category: 'Category',
+        tags: [],
+        isPage: false,
+      });
+
+      expect(postJson).toEqual({
+        key: 'Key',
+        title: 'Title',
+        author: 'Author',
+        date: '1672531200000',
+        body: 'Body',
+        category: 'Category',
+        tags: [],
+        isPage: false,
+      });
+    });
+  });
+
+  describe('object', () => {
+    it('parses a generic object', () => {
+      const postJson = PostJson.fromObject({
+        key: 'Key',
+        title: 'Title',
+        author: 'Author',
+        date: '1672531200000',
         body: 'Body',
         category: 'Category',
         tags: [],

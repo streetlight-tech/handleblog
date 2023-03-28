@@ -12,19 +12,31 @@ export class PostJson {
   public tags: string[];
   public isPage: boolean;
 
-  constructor(post?: IPost) {
-    if (post) {
-      Object.assign(this, {
-        ...post,
-        date: DateHelper.timestampStringFromDate(post.date),
-      });
-    }
-  }
-
   public toIPost(): IPost {
     return{
       ...this,
       date: DateHelper.dateFromTimestampString(this.date),
     }
+  }
+
+  public static fromPost(source: IPost) {
+    const postJson = new PostJson();
+
+    if (source) {
+      Object.assign(postJson, {
+        ...source,
+        date: DateHelper.timestampStringFromDate(source.date),
+      });
+    }
+
+    return postJson;
+  }
+
+  public static fromObject(source: any): PostJson {
+    const postJson = new PostJson();
+
+    Object.assign(postJson, source);
+
+    return postJson;
   }
 }

@@ -313,6 +313,21 @@ That is the list.`;
       expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post with an image <img src="https://content.here.com/image.png" alt="image" /></p>\n/Posts about Blogs[blog,post,]');
     });
 
+    it('should return undefined if no template found', async() => {
+      mockGetPostTemplate.mockResolvedValue(undefined);
+      const result = await renderer.renderPost('post-1');
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined if no post found', async() => {
+      mockGetPostTemplate.mockResolvedValue('{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]');
+      mockGetPost.mockResolvedValueOnce(undefined);
+      
+      const result = await renderer.renderPost('post-1');
+
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('getExcerpt', () => {
