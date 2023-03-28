@@ -9,7 +9,6 @@ import {
 const mockGetHomeTemplate = jest.fn();
 const mockGetListTemplate = jest.fn();
 const mockGetPostTemplate = jest.fn();
-
 const templateProvider: ITemplateProvider = {
   getTemplate: jest.fn(),
   getHomeTemplate: mockGetHomeTemplate,
@@ -249,6 +248,35 @@ That is the list.`;
       const result = await renderer.renderList();
 
       expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
+    });
+
+    it('should render template with all post fields', async() => {
+      mockList.mockResolvedValueOnce([
+        {
+          key: 'post-1',
+          title: 'Blog post 1',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 1),
+          body: 'This is a blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        },
+        {
+          key: 'post-2',
+          title: 'Blog post 2',
+          author: 'Bloggy Blogerton',
+          date: new Date(2000, 0, 2),
+          body: 'This is another blog post',
+          category: 'Posts about Blogs',
+          tags: [ 'blog', 'post' ],
+        }
+      ]);
+
+      mockGetListTemplate.mockResolvedValueOnce('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{{body}}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
+
+      const result = await renderer.renderList();
+
+      expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::<p>This is a blog post</p>\n/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:Jan 2, 2000::<p>This is another blog post</p>\n/Posts about Blogs[blog,post,]');
     });
   });
 
