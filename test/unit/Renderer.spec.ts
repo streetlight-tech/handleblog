@@ -160,7 +160,7 @@ That is the list.`;
   });
 
   describe('renderHome()', () => {
-    it('should render template with all post fields and handle missing dates', async() => {
+    it('should render template with all post fields, exclude pages, and handle missing dates', async() => {
       mockListPosts.mockResolvedValueOnce([
         {
           key: 'post-1',
@@ -184,8 +184,13 @@ That is the list.`;
       mockGetHomeTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{excerpt}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
       const result = await renderer.renderHome();
 
+      expect(mockListPosts).toHaveBeenCalledWith({ isPage: false});
+
       expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:::This is another blog post/Posts about Blogs[blog,post,]');
     });
+  });
+
+  describe('renderList()', () => {
 
     it('should render list with minimum post fields', async() => {
       mockListPosts.mockResolvedValueOnce([

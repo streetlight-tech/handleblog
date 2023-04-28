@@ -70,6 +70,11 @@ export class Renderer {
 
   public async renderHome(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getHomeTemplate();
+    if (!query) {
+      query = {
+        isPage: false,
+      };
+    }
     const posts = await this.postProvider.list(query);
 
     return this.render(template, { 
