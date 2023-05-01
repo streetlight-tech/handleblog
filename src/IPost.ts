@@ -2,10 +2,11 @@ export interface IPost {
   key: string;
   title: string;
   author?: string;
-  date?: string;
+  date?: Date;
   body?: string;
   excerpt?: string;
-  imageUrl?: string;
+  image?: string;
   category?: string;
   tags?: string[];
+  isPage?: boolean;
 }
