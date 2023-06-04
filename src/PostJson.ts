@@ -1,10 +1,11 @@
-import { DateHelper, IPost } from './index';
+import { DateHelper, IPost, PostStatus } from './index';
 
 export class PostJson {
   public key: string;
   public title: string;
   public author: string;
   public date: string;
+  public status: string;
   public body: string;
   public excerpt: string;
   public image: string;
@@ -15,6 +16,7 @@ export class PostJson {
   public toIPost(): IPost {
     return{
       ...this,
+      status: this.status as PostStatus,
       date: DateHelper.dateFromTimestampString(this.date),
     }
   }
