@@ -3,6 +3,7 @@ import {
   IPostProvider, 
   IPostQuery, 
   ITemplateProvider, 
+  PostStatus, 
   Renderer 
 } from '../../src/index';
 
@@ -71,7 +72,7 @@ source
 
 [link](/link) ![image](image) **bold** *italics* ~~strikethrough~~ \`inline-code\``;
 
-      const post: IPost = { key: 'key', title: 'title', body };
+      const post: IPost = { key: 'key', title: 'title', body, status: PostStatus.Published };
       
       renderer.parseBody(post);
 

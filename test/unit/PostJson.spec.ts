@@ -1,4 +1,4 @@
-import { PostJson } from '../../src';
+import { PostJson, PostStatus } from '../../src';
 
 describe('PostJson', () => {
   describe('fromPost', () => {
@@ -8,6 +8,7 @@ describe('PostJson', () => {
         title: 'Title',
         author: 'Author',
         date: new Date('2023-01-01'),
+        status: PostStatus.Published,
         body: 'Body',
         category: 'Category',
         tags: [],
@@ -19,6 +20,7 @@ describe('PostJson', () => {
         title: 'Title',
         author: 'Author',
         date: '1672531200000',
+        status: 'published',
         body: 'Body',
         category: 'Category',
         tags: [],
@@ -34,6 +36,7 @@ describe('PostJson', () => {
         title: 'Title',
         author: 'Author',
         date: '1672531200000',
+        status: 'published',
         body: 'Body',
         category: 'Category',
         tags: [],
@@ -45,6 +48,7 @@ describe('PostJson', () => {
         title: 'Title',
         author: 'Author',
         date: '1672531200000',
+        status: 'published',
         body: 'Body',
         category: 'Category',
         tags: [],
@@ -63,6 +67,7 @@ describe('PostJson', () => {
           title: 'Title',
           author: 'Author',
           date: '1672531200000',
+          status: 'published',
           body: 'Body',
           category: 'Category',
           tags: [],
@@ -77,6 +82,7 @@ describe('PostJson', () => {
         title: 'Title',
         author: 'Author',
         date: new Date('2023-01-01'),
+        status: 'published',
         body: 'Body',
         category: 'Category',
         tags: [],
