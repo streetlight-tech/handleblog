@@ -141,6 +141,10 @@ export class Renderer {
   }
 
   public static getExcerpt(body: string): string {
+    if (!body) {
+      return '';
+    }
+
     const maxLength = 500;
 
     const plainText = Renderer.stripMarkdown(body);
