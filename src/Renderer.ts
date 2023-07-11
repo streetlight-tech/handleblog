@@ -6,6 +6,7 @@ import { IPost } from './IPost';
 import { IRendererOptions } from './IRendererOptions';
 import { ITemplateProvider } from './ITemplateProvider';
 import { IPostQuery } from './IPostQuery';
+import { PostStatus } from './PostStatus';
 
 const excerptRenderer = Object.assign(new MDRenderer(), {
   code() {
@@ -70,6 +71,14 @@ export class Renderer {
 
   public async renderHome(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getHomeTemplate();
+
+    if (!query) {
+      query = {
+        isPage: false,
+        status: PostStatus.Published,
+      };
+    }
+
     const posts = await this.postProvider.list(query);
 
     return this.render(template, { 
@@ -80,6 +89,14 @@ export class Renderer {
 
   public async renderList(query?: IPostQuery): Promise<string> {
     const template = await this.templateProvider.getListTemplate();
+    
+    if (!query) {
+      query = {
+        isPage: false,
+        status: PostStatus.Published,
+      };
+    }
+    
     const posts = await this.postProvider.list(query);
 
     return this.render(template, { 
@@ -140,7 +157,7 @@ export class Renderer {
     return plainText.replace(spaces, ' ');
   }
 
-  public static getExcerpt(body: string): string {
+  public static getExcerpt(body: string | undefined): string {
     if (!body) {
       return '';
     }

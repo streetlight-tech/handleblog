@@ -1,7 +1,6 @@
 import { 
   IPost, 
   IPostProvider, 
-  IPostQuery, 
   ITemplateProvider, 
   PostStatus, 
   Renderer 
@@ -185,8 +184,16 @@ That is the list.`;
       mockGetHomeTemplate.mockResolvedValue('{{#posts}}{{key}}:{{title}}:{{author}}:{{formatDate date}}::{{excerpt}}/{{category}}[{{#tags}}{{this}},{{/tags}}]{{/posts}}');
       const result = await renderer.renderHome();
 
+      expect(mockListPosts).toHaveBeenCalledWith({
+        status: PostStatus.Published,
+        isPage: false,
+      });
+
       expect(result).toBe('post-1:Blog post 1:Bloggy Blogerton:Jan 1, 2000::This is a blog post/Posts about Blogs[blog,post,]post-2:Blog post 2:Bloggy Blogerton:::This is another blog post/Posts about Blogs[blog,post,]');
     });
+  });
+
+  describe('renderList()', () => {
 
     it('should render list with minimum post fields', async() => {
       mockListPosts.mockResolvedValueOnce([
@@ -203,12 +210,15 @@ That is the list.`;
       mockGetListTemplate.mockResolvedValue('<ul>{{#posts}}<li><a href="/post/{{key}}">{{title}}</a></li>{{/posts}}</ul>');
       const result = await renderer.renderList();
 
+      expect(mockListPosts).toHaveBeenCalledWith({
+        status: PostStatus.Published,
+        isPage: false,
+      });
+
       expect(result).toBe('<ul><li><a href="/post/post-1">Blog post 1</a></li><li><a href="/post/post-2">Blog post 2</a></li></ul>');
     });
-  });
-
-  describe('renderList()', () => {
-    it('should render template with all post fields', async() => {
+    
+    it('should render template with all post fields filtered by default', async() => {
       mockListPosts.mockResolvedValueOnce([
         {
           key: 'post-1',
@@ -217,6 +227,7 @@ That is the list.`;
           date: new Date(2000, 0, 1),
           excerpt: 'This is a blog post',
           category: 'Posts about Blogs',
+          status: 'published',
           tags: [ 'blog', 'post' ],
         },
         {
@@ -226,6 +237,7 @@ That is the list.`;
           date: new Date(2000, 0, 2),
           excerpt: 'This is another blog post',
           category: 'Posts about Blogs',
+          status: 'published',
           tags: [ 'blog', 'post' ],
         }
       ]);
@@ -364,6 +376,12 @@ That is the list.`;
       const excerpt = Renderer.getExcerpt(input);
 
       expect(excerpt).toBe('nothingtotrimherebutitshouldntmatter');
+    });
+
+    it('should return empty string if body is undefined', () => {
+      const excerpt = Renderer.getExcerpt(undefined);
+
+      expect(excerpt).toBe('');
     });
 
     it('should trim at a sentence', () => {
